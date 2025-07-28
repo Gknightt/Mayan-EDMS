@@ -19,12 +19,16 @@ RUN apt-get update && apt-get install -y \
 # Set workdir
 WORKDIR /app
 
-# Copy your Mayan EDMS source code (cloned from GitHub)
-COPY . /app
+# Copy requirements folder and file
+COPY requirements/ requirements/
+COPY requirements.txt .
 
 # Install dependencies
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+
+# Copy the rest of your app
+COPY . .
 
 # Environment setup
 ENV MAYAN_MEDIA_ROOT=/var/lib/mayan
