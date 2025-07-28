@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     libffi-dev \
     libssl-dev \
+    libldap2-dev \
     poppler-utils \
     && rm -rf /var/lib/apt/lists/*
 
