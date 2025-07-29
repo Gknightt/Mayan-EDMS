@@ -1,42 +1,26 @@
-FROM python:3.10-slim
+FROM python:3.9-slim
 
-# System dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    curl \
-    python3-dev \
-    libmagic1 \
-    tesseract-ocr \
-    ghostscript \
-    libjpeg-dev \
-    zlib1g-dev \
-    libffi-dev \
-    libssl-dev \
-    libldap2-dev \
-    poppler-utils \
-    && rm -rf /var/lib/apt/lists/*
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y gcc libpq-dev tesseract-ocr && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set workdir
+# Set work directory
 WORKDIR /app
 
-# Copy requirements folder and file
-COPY requirements/ requirements/
-COPY requirements.txt .
+# Copy requirements
+COPY ../requirements.txt /app/requirements.txt
+COPY ../requirements /app/requirements
 
-# Install dependencies
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
 
-# Copy the rest of your app
-COPY . .
+# Copy project files
+COPY .. /app
 
-# Environment setup
-ENV MAYAN_MEDIA_ROOT=/var/lib/mayan
-ENV DJANGO_SETTINGS_MODULE=mayan.settings.production
-
-# Port exposure
+# Expose port
 EXPOSE 8000
 
-# Run migrations and launch
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+# Default command (adjust if you use a different entrypoint)
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "mayan.wsgi"]
