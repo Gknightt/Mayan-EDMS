@@ -9,6 +9,12 @@ WORKDIR /app
 
 COPY /requirements.txt /app/requirements.txt
 COPY /requirements /app/requirements
+# Add this before the CMD instruction
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
+
+# Update the CMD
+CMD ["/app/start.sh"]
 
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
