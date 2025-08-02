@@ -1,3 +1,6 @@
+#!/bin/bash
+set -e
+
 # Wait for database to be ready
 echo "Waiting for database..."
 python manage.py check --database default
