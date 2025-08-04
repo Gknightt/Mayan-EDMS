@@ -1,18 +1,34 @@
 #!/bin/bash
-set -e  # Exit on any error
+set -e
+
+# Railway will provide PORT automatically
+export PORT=${PORT:-8000}
+
+# Debug info
+echo "=== Mayan EDMS Railway Deployment ==="
+echo "Port: $PORT"
+echo "MAYAN_DATABASES: $MAYAN_DATABASES"
+echo "================================="
 
 # Wait for database to be ready with timeout
 echo "Waiting for database..."
-timeout=60
-while ! python manage.py check --database default 2>/dev/null; do
-  echo "Database is unavailable - sleeping"
-  sleep 2
-  timeout=$((timeout - 2))
+timeout=120
+attempt=1
+
+while ! python manage.py check --database default 2>&1; do
+  echo "Database is unavailable - sleeping (attempt $attempt)"
+  sleep 5
+  timeout=$((timeout - 5))
+  attempt=$((attempt + 1))
+  
   if [ $timeout -le 0 ]; then
-    echo "Database connection timeout"
+    echo "Database connection timeout after $attempt attempts"
+    python manage.py check --database default
     exit 1
   fi
 done
+
+echo "Database connection successful!"
 
 # Run migrations
 echo "Running migrations..."
